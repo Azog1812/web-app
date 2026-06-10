@@ -1,6 +1,6 @@
 pipeline {
     agent any
-
+ 
     parameters {
         string(
             name: 'NAME',
@@ -31,7 +31,7 @@ pipeline {
             description: 'Enter SONAR password'
         )
     }
-
+ 
     environment {
         APP_NAME    = "web-app"
         DOCKER_IMAGE = "mydockerhub/web-app"
@@ -39,9 +39,9 @@ pipeline {
         // Snyk token stocké dans Jenkins Credentials (type "Secret text", id: snyk-token)
         SNYK_TOKEN  = credentials('snyk-token')
     }
-
+ 
     stages {
-
+ 
         stage('01 - PRINT PARAMETERS') {
             steps {
                 echo "Hello ${params.NAME}"
@@ -52,23 +52,23 @@ pipeline {
                 """
             }
         }
-
+ 
         stage('02 - CHECKOUT GITHUB') {
             steps {
                 echo "Downloading source code..."
                 git branch: "${params.BRANCH}",
                     credentialsId: 'github-token',   // Jenkins Credential (type: Username/Password ou SSH)
-                    url: 'https://github.com/TON_USER/web-app.git'
+                    url: 'https://github.com/Azog1812/web-app.git'
             }
         }
-
+ 
         stage('03 - BUILD APPLICATION') {
             steps {
                 echo "Installing dependencies..."
                 sh 'npm install'
             }
         }
-
+ 
         /*
         Scan de sécurité Snyk sur les dépendances npm.
         --severity-threshold=high : le pipeline échoue uniquement
@@ -90,7 +90,7 @@ pipeline {
                 }
             }
         }
-
+ 
         stage('05 - RUN TESTS') {
             when {
                 expression { return params.SKIP_TEST == false }
@@ -100,7 +100,7 @@ pipeline {
                 sh 'npm test'
             }
         }
-
+ 
         stage('06 - SONARQUBE ANALYSIS') {
             steps {
                 echo "Scanning source code with SonarQube..."
@@ -113,14 +113,14 @@ pipeline {
                 """
             }
         }
-
+ 
         stage('07 - DOCKER BUILD') {
             steps {
                 echo "Building Docker image..."
                 sh "docker build -t ${DOCKER_IMAGE}:latest ."
             }
         }
-
+ 
         stage('08 - DEPLOY') {
             steps {
                 echo "Deploying application..."
@@ -135,7 +135,7 @@ pipeline {
             }
         }
     }
-
+ 
     post {
         success {
             echo """
