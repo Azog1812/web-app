@@ -37,7 +37,7 @@ pipeline {
         DOCKER_IMAGE = "mydockerhub/web-app"
         SONAR_URL   = "http://localhost:9000"
         // Snyk token stocké dans Jenkins Credentials (type "Secret text", id: snyk-token)
-        SNYK_TOKEN  = credentials('snyk-token')
+        // SNYK_TOKEN  = credentials('snyk-token')  // Décommenter quand le credential est créé
     }
  
     stages {
@@ -63,6 +63,9 @@ pipeline {
         }
  
         stage('03 - BUILD APPLICATION') {
+            tools {
+                nodejs 'NodeJS-20'
+            }
             steps {
                 echo "Installing dependencies..."
                 sh 'npm install'
@@ -75,23 +78,26 @@ pipeline {
         sur les vulnérabilités HIGH ou CRITICAL.
         Retire ce flag si tu veux échouer sur MEDIUM aussi.
         */
-        stage('04 - SNYK SECURITY SCAN') {
-            steps {
-                echo "Running Snyk security scan..."
-                sh '''
-                    snyk auth $SNYK_TOKEN
-                    snyk test --severity-threshold=high --json-file-output=snyk-report.json || true
-                    snyk monitor
-                '''
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'snyk-report.json', allowEmptyArchive: true
-                }
-            }
-        }
+        // stage('04 - SNYK SECURITY SCAN') {
+        //     steps {
+        //         echo "Running Snyk security scan..."
+        //         sh '''
+        //             snyk auth $SNYK_TOKEN
+        //             snyk test --severity-threshold=high --json-file-output=snyk-report.json || true
+        //             snyk monitor
+        //         '''
+        //     }
+        //     post {
+        //         always {
+        //             archiveArtifacts artifacts: 'snyk-report.json', allowEmptyArchive: true
+        //         }
+        //     }
+        // }
  
         stage('05 - RUN TESTS') {
+            tools {
+                nodejs 'NodeJS-20'
+            }
             when {
                 expression { return params.SKIP_TEST == false }
             }
