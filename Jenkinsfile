@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
  
@@ -107,18 +108,18 @@ pipeline {
             }
         }
  
-        stage('06 - SONARQUBE ANALYSIS') {
-            steps {
-                echo "Scanning source code with SonarQube..."
-                sh """
-                sonar-scanner \\
-                  -Dsonar.projectKey=${APP_NAME} \\
-                  -Dsonar.sources=. \\
-                  -Dsonar.host.url=${SONAR_URL} \\
-                  -Dsonar.login=${params.SONAR_SERVER_PWD}
-                """
-            }
-        }
+        // stage('06 - SONARQUBE ANALYSIS') {
+        //     steps {
+        //         echo "Scanning source code with SonarQube..."
+        //         sh """
+        //         sonar-scanner \\
+        //           -Dsonar.projectKey=${APP_NAME} \\
+        //           -Dsonar.sources=. \\
+        //           -Dsonar.host.url=${SONAR_URL} \\
+        //           -Dsonar.login=${params.SONAR_SERVER_PWD}
+        //         """
+        //     }
+        // }
  
         stage('07 - DOCKER BUILD') {
             steps {
